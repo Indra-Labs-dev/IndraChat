@@ -32,6 +32,10 @@ import { initChat } from './chat/controller.js';
 import { initSidebar } from './ui/sidebar.js';
 import { initTopbar } from './ui/topbar.js';
 import { initGlobalListeners } from './events/listeners.js';
+import { startNewConversation } from './chat/controller.js';
+import { estimateTokens } from './utils/tokenizer.js';
+import { openModal } from './ui/modal.js';
+import { getStateValue, dispatch } from './state.js';
 
 /**
  * Initialisation principale de l'application.
@@ -95,31 +99,19 @@ function registerBaseListeners() {
 
   // ── Bouton toggle thème ──
   document.getElementById('btn-toggle-theme')?.addEventListener('click', () => {
-    const html  = document.documentElement;
-    const current = html.getAttribute('data-theme') ?? 'dark';
-    const next    = current === 'dark' ? 'light' : 'dark';
-
-    // Transition fluide
-    html.classList.add('theme-transition');
-    html.setAttribute('data-theme', next);
-    updateThemeIcon(next);
-
-    // Sauvegarder dans le LocalStorage
-    try {
-      const key = `${APP_CONFIG.storagePrefix}settings`;
-      const raw = localStorage.getItem(key);
-      const settings = raw ? JSON.parse(raw) : { ...DEFAULT_SETTINGS };
-      settings.theme = next;
-      localStorage.setItem(key, JSON.stringify(settings));
-    } catch { /* ignore */ }
-
-    // Supprimer la classe de transition après l'animation
-    setTimeout(() => html.classList.remove('theme-transition'), 500);
+    const current = getStateValue('settings.theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    dispatch('settings.theme', next); // theme.js gère l'UI (icône, attribut) via subscribe
   });
 
   // ── Bouton nouveau chat ──
   document.getElementById('btn-new-chat')?.addEventListener('click', () => {
-    showWelcomeScreen();
+    startNewConversation();
+  });
+
+  // ── Bouton paramètres ──
+  document.getElementById('btn-settings')?.addEventListener('click', () => {
+    openModal('settings');
   });
 
   // ── Chips de suggestions ──
@@ -150,10 +142,12 @@ function registerBaseListeners() {
       const hasContent = textarea.value.trim().length > 0;
       if (btnSend) btnSend.disabled = !hasContent;
 
-      // Compteur de tokens (estimation simple pour l'instant)
-      const tokenCount = estimateTokens(textarea.value);
-      const counter    = document.getElementById('token-counter');
-      if (counter) counter.textContent = `${tokenCount} token${tokenCount !== 1 ? 's' : ''}`;
+      // Compteur de tokens
+      if (typeof estimateTokens === 'function') {
+        const tokenCount = estimateTokens(textarea.value);
+        const counter    = document.getElementById('token-counter');
+        if (counter) counter.textContent = `${tokenCount} token${tokenCount !== 1 ? 's' : ''}`;
+      }
     });
 
     // Envoi avec Entrée (Shift+Entrée = nouvelle ligne)
@@ -182,6 +176,13 @@ function registerBaseListeners() {
     });
   }
 
+  // ── Fonction utilitaire : Fermer menus ──
+  function closeAllDropdowns() {
+    document.querySelector('.model-dropdown')?.classList.add('hidden');
+    document.getElementById('btn-model-selector')?.classList.remove('is-open');
+    document.getElementById('conversation-context-menu')?.classList.add('hidden');
+  }
+
   // ── Touche Échap — fermer les menus ouverts ──
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -191,42 +192,24 @@ function registerBaseListeners() {
 
   // ── Clic en dehors — fermer les dropdowns ──
   document.addEventListener('click', (e) => {
-    const dropdown = document.getElementById('model-dropdown');
+    const dropdown = document.querySelector('.model-dropdown');
     const contextMenu = document.getElementById('conversation-context-menu');
     const modelBtn = document.getElementById('btn-model-selector');
 
-    if (dropdown && !dropdown.classList.contains('hidden')) {
-      if (!dropdown.contains(e.target) && e.target !== modelBtn && !modelBtn?.contains(e.target)) {
-        closeAllDropdowns();
-      }
-    }
-    if (contextMenu && !contextMenu.classList.contains('hidden')) {
-      if (!contextMenu.contains(e.target)) {
-        contextMenu.classList.add('hidden');
-      }
+    let clickedInDropdown = dropdown && !dropdown.classList.contains('hidden') && (dropdown.contains(e.target) || modelBtn?.contains(e.target));
+    let clickedInContextMenu = contextMenu && !contextMenu.classList.contains('hidden') && contextMenu.contains(e.target);
+
+    const isOptionBtn = e.target.closest('.nav-item__options-btn');
+
+    if (!clickedInDropdown && !clickedInContextMenu && !isOptionBtn) {
+      closeAllDropdowns();
     }
   });
 
   // ── Bouton modèle — toggle dropdown ──
-  document.getElementById('btn-model-selector')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const dropdown = document.getElementById('model-dropdown');
-    const btn      = document.getElementById('btn-model-selector');
-    if (!dropdown) return;
+  // Géré dans js/ui/topbar.js désormais, mais on peut le garder ici si besoin. 
+  // On le retire d'ici pour éviter les conflits car il est dans topbar.js.
 
-    const isOpen = !dropdown.classList.contains('hidden');
-    if (isOpen) {
-      closeAllDropdowns();
-    } else {
-      // Positionner le dropdown sous le bouton
-      const rect = btn.getBoundingClientRect();
-      dropdown.style.top  = `${rect.bottom + 8}px`;
-      dropdown.style.left = `${rect.left + rect.width / 2 - 180}px`;
-      dropdown.classList.remove('hidden');
-      btn.classList.add('is-open');
-      document.getElementById('model-search-input')?.focus();
-    }
-  });
 
   // ── Bouton plein écran ──
   document.getElementById('btn-fullscreen')?.addEventListener('click', toggleFullscreen);
@@ -296,17 +279,7 @@ function toggleMobileSidebar(open) {
   }
 }
 
-/**
- * Estimation naïve du nombre de tokens (≈4 chars/token, compatible BPE).
- * Le module js/utils/tokenizer.js fournira une implémentation plus précise.
- *
- * @param {string} text - Le texte à mesurer
- * @returns {number} Nombre estimé de tokens
- */
-function estimateTokens(text) {
-  if (!text) return 0;
-  return Math.ceil(text.length / 4);
-}
+
 
 
 // ── Démarrage ──
