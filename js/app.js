@@ -1,15 +1,10 @@
-import { APP_CONFIG, DEFAULT_SETTINGS } from './config.js';
-import { initStore, subscribe } from './state.js';
-import { initTheme } from './ui/theme.js';
-import { initModals } from './ui/modal.js';
-import { initSettingsUI } from './ui/settings.js';
-import { toastSuccess, toastError } from './ui/toast.js';
-import { initDB } from './storage/database.js';
-import { initChat } from './chat/controller.js';
-import { initSidebar } from './ui/sidebar.js';
-import { initTopbar } from './ui/topbar.js';
-import { initGlobalListeners } from './events/listeners.js';
- /* Il initialise tous les sous-modules dans le bon ordre et orchestre
+/**
+ * ============================================================
+ * IndraChat — app.js
+ * Point d'Entrée Principal — Bootstrap de l'Application
+ *
+ * Ce module est le seul chargé par index.html via <script type="module">.
+ * Il initialise tous les sous-modules dans le bon ordre et orchestre
  * le démarrage de l'application.
  *
  * Ordre d'initialisation :
@@ -29,7 +24,14 @@ import { initGlobalListeners } from './events/listeners.js';
 import { APP_CONFIG, DEFAULT_SETTINGS } from './config.js';
 import { initStore, subscribe } from './state.js';
 import { initTheme } from './ui/theme.js';
+import { initModals } from './ui/modal.js';
+import { initSettingsUI } from './ui/settings.js';
 import { toastSuccess, toastError } from './ui/toast.js';
+import { initDB } from './storage/database.js';
+import { initChat } from './chat/controller.js';
+import { initSidebar } from './ui/sidebar.js';
+import { initTopbar } from './ui/topbar.js';
+import { initGlobalListeners } from './events/listeners.js';
 
 /**
  * Initialisation principale de l'application.
