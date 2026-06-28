@@ -1,9 +1,10 @@
-/**
- * ============================================================
- * IndraChat — app.js
- * Point d'Entrée Principal — Bootstrap de l'Application
- *
- * Ce module est le seul chargé par index.html via <script type="module">.
+import { APP_CONFIG, DEFAULT_SETTINGS } from './config.js';
+import { initStore, subscribe } from './state.js';
+import { initTheme } from './ui/theme.js';
+import { initModals } from './ui/modal.js';
+import { initSettingsUI } from './ui/settings.js';
+import { toastSuccess, toastError } from './ui/toast.js';
+import { initDB } from './storage/database.js';
  * Il initialise tous les sous-modules dans le bon ordre et orchestre
  * le démarrage de l'application.
  *
@@ -48,13 +49,18 @@ async function bootstrap() {
     // ── 2. Initialiser le gestionnaire de Thème (s'abonne au State) ──
     initTheme();
 
-    // ── 3. Marquer l'app comme prête visuellement ──
+    // ── 3. Initialiser la Base de Données (IndexedDB) ──
+    await initDB();
+
+    // ── 4. Marquer l'app comme prête visuellement ──
     document.getElementById('app')?.classList.add('is-ready');
 
-    // ── 4. Enregistrer les listeners UI globaux ──
+    // ── 5. Enregistrer les listeners UI et Modales ──
     registerBaseListeners();
+    initModals();
+    initSettingsUI();
 
-    console.log('✅ IndraChat initialisé — Étapes 1 à 5 OK');
+    console.log('✅ IndraChat initialisé — Étapes 1 à 9 OK');
     
     // Afficher un toast de bienvenue uniquement en dev (optionnel)
     // toastSuccess('Prêt', `IndraChat v${APP_CONFIG.version} chargé avec succès.`);
