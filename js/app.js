@@ -5,7 +5,8 @@ import { initModals } from './ui/modal.js';
 import { initSettingsUI } from './ui/settings.js';
 import { toastSuccess, toastError } from './ui/toast.js';
 import { initDB } from './storage/database.js';
- * Il initialise tous les sous-modules dans le bon ordre et orchestre
+import { initChat } from './chat/controller.js';
+ /* Il initialise tous les sous-modules dans le bon ordre et orchestre
  * le démarrage de l'application.
  *
  * Ordre d'initialisation :
@@ -60,7 +61,10 @@ async function bootstrap() {
     initModals();
     initSettingsUI();
 
-    console.log('✅ IndraChat initialisé — Étapes 1 à 9 OK');
+    // ── 6. Initialiser le contrôleur de Chat ──
+    initChat();
+
+    console.log('✅ IndraChat initialisé — Étapes 1 à 13 OK');
     
     // Afficher un toast de bienvenue uniquement en dev (optionnel)
     // toastSuccess('Prêt', `IndraChat v${APP_CONFIG.version} chargé avec succès.`);
