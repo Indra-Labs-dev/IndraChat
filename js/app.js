@@ -6,6 +6,9 @@ import { initSettingsUI } from './ui/settings.js';
 import { toastSuccess, toastError } from './ui/toast.js';
 import { initDB } from './storage/database.js';
 import { initChat } from './chat/controller.js';
+import { initSidebar } from './ui/sidebar.js';
+import { initTopbar } from './ui/topbar.js';
+import { initGlobalListeners } from './events/listeners.js';
  /* Il initialise tous les sous-modules dans le bon ordre et orchestre
  * le démarrage de l'application.
  *
@@ -61,10 +64,17 @@ async function bootstrap() {
     initModals();
     initSettingsUI();
 
-    // ── 6. Initialiser le contrôleur de Chat ──
+    // ── 6. Initialiser l'Interface Latérale et Supérieure ──
+    initSidebar();
+    initTopbar();
+
+    // ── 7. Initialiser le contrôleur de Chat ──
     initChat();
 
-    console.log('✅ IndraChat initialisé — Étapes 1 à 13 OK');
+    // ── 8. Activer les Raccourcis Clavier Globaux ──
+    initGlobalListeners();
+
+    console.log('✅ IndraChat est prêt ! (Toutes les étapes validées)');
     
     // Afficher un toast de bienvenue uniquement en dev (optionnel)
     // toastSuccess('Prêt', `IndraChat v${APP_CONFIG.version} chargé avec succès.`);
