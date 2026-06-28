@@ -1,0 +1,287 @@
+/**
+ * ============================================================
+ * IndraChat — responsive.css
+ * Media Queries — Adaptation Mobile & Tablette
+ *
+ * Breakpoints :
+ *   Mobile  : < 640px
+ *   Tablette : 640px – 1024px
+ *   Desktop  : > 1024px (défaut — pas de media query nécessaire)
+ * ============================================================
+ */
+
+
+/* ============================================================
+   TABLETTE (640px – 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+
+  /* Réduction des marges */
+  .messages-list {
+    padding: var(--space-4) var(--space-4) 0;
+  }
+
+  /* Suggestions en 1 colonne */
+  .welcome-screen__suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  /* Topbar : le centre peut être plus compact */
+  .model-selector {
+    max-width: 220px;
+  }
+  .model-selector__provider {
+    display: none; /* On cache le provider sur tablette */
+  }
+}
+
+
+/* ============================================================
+   MOBILE (< 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* ── Layout ── */
+
+  /**
+   * Sur mobile, la sidebar passe en overlay.
+   * La grille devient une seule colonne.
+   */
+  .app-root {
+    grid-template-columns: 1fr;
+  }
+
+  /**
+   * La sidebar est hors flux (position: fixed)
+   * et glisse depuis la gauche.
+   */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    max-width: 85vw;
+    transform: translateX(-100%);
+    transition: transform var(--duration-slow) var(--ease-out);
+    z-index: var(--z-sidebar);
+    box-shadow: var(--shadow-2xl);
+  }
+
+  /* Sidebar ouverte */
+  .sidebar.is-open {
+    transform: translateX(0);
+    animation: sidebarSlideIn var(--duration-slow) var(--ease-out) both;
+  }
+
+  /* Main occupe toute la largeur */
+  .main {
+    border-left: none;
+  }
+
+  /* ── Topbar ── */
+
+  /* Bouton hamburger visible */
+  .topbar__menu-btn {
+    display: flex;
+  }
+
+  /* Plus de place pour le titre */
+  .topbar__title {
+    max-width: 140px;
+    font-size: var(--text-sm);
+  }
+
+  /* Centre plus compact */
+  .topbar__center {
+    flex: none;
+  }
+
+  .model-selector {
+    max-width: 160px;
+    padding: var(--space-1) var(--space-2);
+  }
+  .model-selector__provider,
+  .model-selector__sep {
+    display: none;
+  }
+
+  /* ── Chat ── */
+
+  .messages-list {
+    padding: var(--space-3) var(--space-3) 0;
+  }
+
+  /* Bulles de messages légèrement plus compactes */
+  .message__bubble {
+    padding: var(--space-2-5) var(--space-3);
+  }
+
+  /* Suggestions en 1 colonne */
+  .welcome-screen__suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-screen__logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .welcome-screen__title {
+    font-size: var(--text-xl);
+  }
+
+  /* ── Input ── */
+
+  .input-area {
+    padding: var(--space-2) var(--space-3) var(--space-3);
+  }
+
+  /* Info footer input — masqué sur mobile pour gagner de la place */
+  .input-footer-hint {
+    display: none;
+  }
+
+  /* ── Stats ── */
+
+  /* Barre de stats simplifiée */
+  .generation-stats {
+    padding: var(--space-1) var(--space-3);
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  /* ── Modales ── */
+
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  /* Les modales glissent depuis le bas sur mobile */
+  .modal {
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    max-height: 85dvh;
+    max-width: 100%;
+  }
+  .modal.is-entering {
+    animation: slideInFromBottom var(--duration-normal) var(--ease-spring) both;
+  }
+  .modal--sm,
+  .modal--md {
+    max-width: 100%;
+  }
+
+  /* ── Dropdown modèle ── */
+  .model-dropdown {
+    width: 100vw;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    bottom: 0;
+    left: 0;
+    top: auto;
+    position: fixed;
+    max-height: 70dvh;
+  }
+
+  /* ── Settings ── */
+
+  /* Navigation horizontale en haut */
+  .settings-layout {
+    flex-direction: column;
+  }
+  .settings-nav {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-light);
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-1);
+  }
+  .settings-nav__item {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .settings-nav__item span:not(.sr-only) {
+    display: none; /* Affiche uniquement l'icône sur mobile */
+  }
+}
+
+
+/* ============================================================
+   TRÈS PETIT ÉCRAN (< 400px)
+   ============================================================ */
+@media (max-width: 400px) {
+
+  .topbar__title {
+    max-width: 90px;
+    font-size: var(--text-xs);
+  }
+
+  /* Cachons quelques boutons topbar sur très petit écran */
+  #btn-fullscreen {
+    display: none;
+  }
+}
+
+
+/* ============================================================
+   GRAND ÉCRAN (> 1440px) — mode large
+   ============================================================ */
+@media (min-width: 1440px) {
+
+  :root {
+    --message-max-width: var(--message-max-width-wide);
+  }
+
+  .welcome-screen__suggestions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* ============================================================
+   PRINT — Styles d'impression
+   ============================================================ */
+@media print {
+
+  /* Masquer les éléments non pertinents */
+  .sidebar,
+  .topbar,
+  .input-area,
+  .generation-stats,
+  .message__actions,
+  #btn-toggle-sidebar,
+  #btn-new-chat,
+  .toast-container,
+  .modal-root {
+    display: none !important;
+  }
+
+  /* Chat prend toute la page */
+  .app-root {
+    display: block;
+  }
+
+  .main {
+    height: auto;
+  }
+
+  .chat-container {
+    overflow: visible;
+  }
+
+  /* Fond blanc pour l'impression */
+  body,
+  .message__bubble,
+  .code-block {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Blocs de code avec bordure */
+  .code-block {
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+}

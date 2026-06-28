@@ -1,0 +1,543 @@
+/**
+ * ============================================================
+ * IndraChat — animations.css
+ * Keyframes & Animations Globales
+ *
+ * Ce fichier définit TOUTES les @keyframes du projet.
+ * Les animations sont référencées par nom dans les composants.
+ *
+ * Sections :
+ *   1.  Entrées / Apparitions (fade, slide, scale)
+ *   2.  Sorties / Disparitions
+ *   3.  Streaming & Génération
+ *   4.  Loaders & Spinners
+ *   5.  Attention / Signalement
+ *   6.  Sidebar
+ *   7.  Toast / Notifications
+ *   8.  Réduction du mouvement (prefers-reduced-motion)
+ * ============================================================
+ */
+
+
+/* ============================================================
+   1. ENTRÉES / APPARITIONS
+   ============================================================ */
+
+/**
+ * fadeIn — fondu simple d'apparition.
+ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/**
+ * fadeInUp — fondu avec légère montée (messages, modales...).
+ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * fadeInDown — fondu avec légère descente (dropdown, menus...).
+ */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * fadeInLeft — glisse depuis la gauche (sidebar...).
+ */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/**
+ * fadeInRight — glisse depuis la droite (panneau de détails...).
+ */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/**
+ * scaleIn — zoom d'apparition (modales, toasts...).
+ */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/**
+ * scaleInSpring — zoom avec effet ressort (boutons, badges...).
+ */
+@keyframes scaleInSpring {
+  0%   { opacity: 0; transform: scale(0.8); }
+  60%  { opacity: 1; transform: scale(1.05); }
+  80%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+/**
+ * slideInFromBottom — slide depuis le bas (toast, panneau mobile...).
+ */
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * slideInFromTop — slide depuis le haut.
+ */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ============================================================
+   2. SORTIES / DISPARITIONS
+   ============================================================ */
+
+/**
+ * fadeOut — fondu de disparition.
+ */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/**
+ * fadeOutDown — fondu avec descente.
+ */
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/**
+ * fadeOutUp — fondu avec montée.
+ */
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/**
+ * scaleOut — zoom de disparition.
+ */
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/**
+ * slideOutToBottom — glisse vers le bas pour disparaître.
+ */
+@keyframes slideOutToBottom {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+
+/* ============================================================
+   3. STREAMING & GÉNÉRATION
+   ============================================================ */
+
+/**
+ * cursorBlink — curseur clignotant pendant la génération de réponse.
+ * Appliqué à un pseudo-élément ::after dans chat.css.
+ */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/**
+ * shimmer — effet de chargement/skeleton sur les messages en attente.
+ */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/**
+ * streamingPulse — légère pulsation de la bordure pendant le streaming.
+ */
+@keyframes streamingPulse {
+  0%, 100% {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 0 rgba(var(--color-accent-rgb), 0);
+  }
+  50% {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(var(--color-accent-rgb), 0.15);
+  }
+}
+
+/**
+ * typingDot — animation des 3 points de frappe (loader "en train d'écrire").
+ */
+@keyframes typingDot {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================================
+   4. LOADERS & SPINNERS
+   ============================================================ */
+
+/**
+ * spin — rotation continue (spinner de chargement).
+ */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/**
+ * spinReverse — rotation inverse (spinner imbriqué).
+ */
+@keyframes spinReverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+
+/**
+ * pulse — pulsation d'opacité (indicateur de connexion, etc.).
+ */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/**
+ * breathe — pulsation de scale légère (avatar en train d'écouter...).
+ */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
+}
+
+/**
+ * ripple — effet ripple Material (boutons, clics...).
+ */
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/**
+ * progressBar — animation de la barre de progression indéterminée.
+ */
+@keyframes progressBar {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+
+/* ============================================================
+   5. ATTENTION / SIGNALEMENT
+   ============================================================ */
+
+/**
+ * shake — tremblement horizontal (erreur de validation, accès refusé...).
+ */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 50%, 90% { transform: translateX(-6px); }
+  30%, 70%      { transform: translateX(6px); }
+}
+
+/**
+ * bounce — rebond vertical (nouvelle notification...).
+ */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-16px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/**
+ * wiggle — légère oscillation (badge, icône d'alerte...).
+ */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20%       { transform: rotate(-8deg); }
+  40%       { transform: rotate(8deg); }
+  60%       { transform: rotate(-5deg); }
+  80%       { transform: rotate(5deg); }
+}
+
+/**
+ * flash — clignotement de fond (highlight d'un élément...).
+ */
+@keyframes flash {
+  0%, 100% { background-color: transparent; }
+  50%       { background-color: rgba(var(--color-accent-rgb), 0.2); }
+}
+
+/**
+ * highlight — surbrillance momentanée d'un message édité/copié.
+ */
+@keyframes highlight {
+  0%   { background-color: rgba(var(--color-accent-rgb), 0.25); }
+  100% { background-color: transparent; }
+}
+
+
+/* ============================================================
+   6. SIDEBAR
+   ============================================================ */
+
+/**
+ * sidebarSlideIn — ouverture sidebar mobile.
+ */
+@keyframes sidebarSlideIn {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/**
+ * sidebarSlideOut — fermeture sidebar mobile.
+ */
+@keyframes sidebarSlideOut {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+
+/* ============================================================
+   7. TOAST / NOTIFICATIONS
+   ============================================================ */
+
+/**
+ * toastEnter — entrée du toast depuis la droite.
+ */
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateX(110%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/**
+ * toastLeave — sortie du toast vers la droite.
+ */
+@keyframes toastLeave {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    max-height: 120px;
+    margin-bottom: var(--space-2);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(110%) scale(0.95);
+    max-height: 0;
+    margin-bottom: 0;
+  }
+}
+
+/**
+ * toastProgress — barre de progression du timer d'auto-dismiss.
+ */
+@keyframes toastProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+
+/* ============================================================
+   8. MODAL
+   ============================================================ */
+
+/**
+ * modalBackdropIn — apparition du backdrop sombre.
+ */
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/**
+ * modalBackdropOut — disparition du backdrop.
+ */
+@keyframes modalBackdropOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/**
+ * modalIn — apparition de la fenêtre modale.
+ */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/**
+ * modalOut — disparition de la fenêtre modale.
+ */
+@keyframes modalOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.94) translateY(16px);
+  }
+}
+
+
+/* ============================================================
+   9. RÉDUCTION DU MOUVEMENT
+   Respecte les préférences d'accessibilité de l'utilisateur.
+   Toutes les animations sont supprimées ou réduites.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Conserve uniquement les animations fonctionnelles indispensables */
+  .keep-animation {
+    animation-duration: revert !important;
+    transition-duration: revert !important;
+  }
+}
+
+
+/* ============================================================
+   CLASSES D'ANIMATION UTILITAIRES
+   Appliquées via JS pour déclencher les animations.
+   ============================================================ */
+
+/* Entrées */
+.anim-fade-in        { animation: fadeIn        var(--duration-normal) var(--ease-out) both; }
+.anim-fade-in-up     { animation: fadeInUp      var(--duration-normal) var(--ease-out) both; }
+.anim-fade-in-down   { animation: fadeInDown    var(--duration-normal) var(--ease-out) both; }
+.anim-fade-in-left   { animation: fadeInLeft    var(--duration-normal) var(--ease-out) both; }
+.anim-fade-in-right  { animation: fadeInRight   var(--duration-normal) var(--ease-out) both; }
+.anim-scale-in       { animation: scaleIn       var(--duration-normal) var(--ease-spring) both; }
+.anim-scale-in-spring { animation: scaleInSpring var(--duration-slow) var(--ease-default) both; }
+
+/* Sorties */
+.anim-fade-out       { animation: fadeOut       var(--duration-fast)   var(--ease-in) both; }
+.anim-fade-out-down  { animation: fadeOutDown   var(--duration-fast)   var(--ease-in) both; }
+.anim-scale-out      { animation: scaleOut      var(--duration-fast)   var(--ease-in) both; }
+
+/* Attention */
+.anim-shake          { animation: shake         var(--duration-slow)   var(--ease-default); }
+.anim-bounce         { animation: bounce        1s                     infinite; }
+.anim-wiggle         { animation: wiggle        var(--duration-slow)   var(--ease-default); }
+.anim-pulse          { animation: pulse         2s                     ease-in-out infinite; }
+.anim-highlight      { animation: highlight     1.2s                   var(--ease-out); }
+
+/* Loaders */
+.anim-spin           { animation: spin          1s                     linear infinite; }
+.anim-spin-slow      { animation: spin          2s                     linear infinite; }
+.anim-breathe        { animation: breathe       2s                     ease-in-out infinite; }

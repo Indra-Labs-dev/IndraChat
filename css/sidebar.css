@@ -1,0 +1,506 @@
+/**
+ * ============================================================
+ * IndraChat — sidebar.css
+ * Styles de la Barre Latérale Gauche
+ *
+ * Contient :
+ *   - Structure de la sidebar (header, content, footer)
+ *   - Barre de recherche
+ *   - Sections (favoris, dossiers, récents)
+ *   - Items de conversation
+ *   - Items de dossier (avec expand/collapse)
+ *   - États (actif, hover, favoris, archivé)
+ *   - États vides
+ * ============================================================
+ */
+
+
+/* ============================================================
+   CONTENEUR PRINCIPAL DE LA SIDEBAR
+   ============================================================ */
+
+.sidebar {
+  /* Positionnement dans la grille .app-root */
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-border);
+  position: relative;
+  z-index: var(--z-sidebar);
+  transition: width var(--duration-slow) var(--ease-default);
+  user-select: none;
+}
+
+
+/* ============================================================
+   EN-TÊTE DE LA SIDEBAR
+   ============================================================ */
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  height: var(--topbar-height);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Logo + Nom de l'app */
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.sidebar__logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  filter: drop-shadow(0 2px 8px rgba(var(--color-accent-rgb), 0.4));
+}
+
+.sidebar__brand-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: var(--tracking-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bouton "+" Nouveau Chat */
+.sidebar__new-chat-btn {
+  background-color: var(--color-accent);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-accent);
+  transition: var(--transition-fast);
+}
+.sidebar__new-chat-btn:hover {
+  background-color: var(--color-accent-hover);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-md);
+}
+.sidebar__new-chat-btn:active {
+  transform: scale(0.95);
+}
+
+
+/* ============================================================
+   BARRE DE RECHERCHE
+   ============================================================ */
+
+.sidebar__search-wrapper {
+  padding: var(--space-2-5) var(--space-3);
+  flex-shrink: 0;
+}
+
+.sidebar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-3);
+  transition: var(--transition-fast);
+}
+
+.sidebar__search:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.15);
+  background-color: var(--color-surface);
+}
+
+.sidebar__search-icon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.sidebar__search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  min-width: 0;
+  /* Supprime le style natif du champ search */
+  -webkit-appearance: none;
+}
+.sidebar__search-input::-webkit-search-cancel-button {
+  display: none; /* On gère notre propre bouton clear */
+}
+
+.sidebar__search-clear {
+  color: var(--color-text-muted);
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  transition: var(--transition-fast);
+}
+.sidebar__search-clear:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-3);
+}
+
+
+/* ============================================================
+   ZONE DE CONTENU SCROLLABLE
+   ============================================================ */
+
+.sidebar__content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-2) 0;
+  /* Espace pour éviter que le dernier item soit caché par le footer */
+  padding-bottom: var(--space-4);
+}
+
+
+/* ============================================================
+   SECTIONS (Favoris, Dossiers, Récentes)
+   ============================================================ */
+
+.sidebar__section {
+  margin-bottom: var(--space-3);
+}
+
+.sidebar__section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semi);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  cursor: default;
+}
+
+.sidebar__section-header svg {
+  opacity: 0.6;
+}
+
+
+/* ============================================================
+   LISTE DE CONVERSATIONS
+   ============================================================ */
+
+.sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 var(--space-2);
+}
+
+
+/* ============================================================
+   ITEM DE CONVERSATION
+   ============================================================ */
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  position: relative;
+  min-width: 0;
+  /* Permet la gestion du hover sur les actions */
+  overflow: hidden;
+}
+
+.conversation-item:hover {
+  background-color: var(--color-sidebar-hover);
+}
+
+.conversation-item.is-active {
+  background-color: var(--color-sidebar-active);
+}
+
+/* En mode dark, accentuation légère de l'actif */
+[data-theme="dark"] .conversation-item.is-active {
+  background-color: var(--color-surface-3);
+}
+
+/* Focus clavier */
+.conversation-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+/* Icône de conversation */
+.conversation-item__icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.conversation-item:hover .conversation-item__icon,
+.conversation-item.is-active .conversation-item__icon {
+  color: var(--color-text-secondary);
+}
+
+/* Titre de la conversation */
+.conversation-item__title {
+  flex: 1;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+  min-width: 0;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.conversation-item:hover .conversation-item__title,
+.conversation-item.is-active .conversation-item__title {
+  color: var(--color-text-primary);
+}
+
+/* Actions (visibles au hover) */
+.conversation-item__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0-5);
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(4px);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+.conversation-item:hover .conversation-item__actions,
+.conversation-item.is-active .conversation-item__actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.conversation-item__action-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: var(--transition-fast);
+}
+.conversation-item__action-btn:hover {
+  background-color: var(--color-bg-sunken);
+  color: var(--color-text-primary);
+}
+
+/* État favori */
+.conversation-item.is-favorite .conversation-item__icon svg {
+  fill: var(--primitive-yellow-400);
+  stroke: var(--primitive-yellow-400);
+}
+
+/* État archivé */
+.conversation-item.is-archived {
+  opacity: 0.6;
+}
+
+/* Indicateur "nouveau message non lu" */
+.conversation-item__unread {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* Drag & Drop */
+.conversation-item.is-dragging {
+  opacity: 0.4;
+}
+.conversation-item.drag-over {
+  background-color: var(--color-accent-light);
+  outline: 1px dashed var(--color-accent);
+}
+
+
+/* ============================================================
+   DOSSIERS
+   ============================================================ */
+
+.sidebar__folders {
+  padding: 0 var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.folder-item {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* En-tête du dossier (cliquable pour expand/collapse) */
+.folder-item__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.folder-item__header:hover {
+  background-color: var(--color-sidebar-hover);
+  color: var(--color-text-primary);
+}
+
+/* Flèche d'expand */
+.folder-item__arrow {
+  color: var(--color-text-muted);
+  transition: transform var(--duration-fast) var(--ease-out);
+  flex-shrink: 0;
+}
+.folder-item.is-open .folder-item__arrow {
+  transform: rotate(90deg);
+}
+
+.folder-item__icon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.folder-item__name {
+  flex: 1;
+  min-width: 0;
+}
+
+.folder-item__count {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-3);
+  border-radius: var(--radius-full);
+  padding: 1px var(--space-1-5);
+  flex-shrink: 0;
+}
+
+/* Liste des conversations dans un dossier */
+.folder-item__list {
+  padding-left: var(--space-4);
+  /* Animation expand */
+  overflow: hidden;
+  transition:
+    max-height var(--duration-slow) var(--ease-default),
+    opacity var(--duration-normal) var(--ease-default);
+}
+.folder-item.is-open .folder-item__list {
+  display: flex;
+}
+
+
+/* ============================================================
+   ÉTAT VIDE DE LA SIDEBAR
+   ============================================================ */
+
+.sidebar__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  animation: fadeIn var(--duration-slow) var(--ease-out) both;
+}
+
+.sidebar__empty svg {
+  opacity: 0.4;
+}
+
+.sidebar__empty p {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.sidebar__empty span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   PIED DE SIDEBAR
+   ============================================================ */
+
+.sidebar__footer {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sidebar__footer-divider {
+  margin: var(--space-1) 0;
+}
+
+.sidebar__footer-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  transition: var(--transition-fast);
+  text-align: left;
+}
+.sidebar__footer-btn:hover {
+  background-color: var(--color-sidebar-hover);
+  color: var(--color-text-primary);
+}
+.sidebar__footer-btn svg {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* Bouton paramètres — mise en avant légère */
+#btn-settings:hover svg {
+  color: var(--color-accent);
+  transform: rotate(30deg);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+
+
+/* ============================================================
+   ÉTAT DE RECHERCHE (résultats filtrés)
+   ============================================================ */
+
+/* Mise en évidence du texte correspondant à la recherche */
+.conversation-item .search-highlight {
+  background-color: rgba(var(--color-accent-rgb), 0.25);
+  color: var(--color-text-accent);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* Message "aucun résultat" */
+.sidebar__no-results {
+  text-align: center;
+  padding: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,211 @@
+/**
+ * ============================================================
+ * IndraChat — settings.css
+ * Page de Paramètres
+ * ============================================================
+ */
+
+/* Conteneur principal de la page paramètres */
+.settings-layout {
+  display: flex;
+  gap: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Navigation latérale des tabs */
+.settings-nav {
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border-light);
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.settings-nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+  width: 100%;
+}
+.settings-nav__item:hover {
+  background-color: var(--color-surface-3);
+  color: var(--color-text-primary);
+}
+.settings-nav__item.is-active {
+  background-color: var(--color-accent-light);
+  color: var(--color-text-accent);
+  font-weight: var(--font-weight-medium);
+}
+.settings-nav__item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* Corps du panneau de paramètres */
+.settings-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+  display: none;
+}
+.settings-panel.is-active { display: block; }
+
+/* Section de paramètres */
+.settings-section {
+  margin-bottom: var(--space-8);
+}
+.settings-section__title {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semi);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Groupe de paramètre (label + contrôle) */
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.settings-field--row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.settings-description {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Input settings */
+.settings-input {
+  width: 100%;
+  padding: var(--space-2-5) var(--space-3);
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: var(--transition-fast);
+}
+.settings-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent-rgb), 0.15);
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle__track {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-surface-3);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out);
+  border: 1px solid var(--color-border);
+}
+.toggle__thumb {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: white;
+  border-radius: var(--radius-full);
+  transition: transform var(--duration-fast) var(--ease-spring);
+  box-shadow: var(--shadow-sm);
+}
+.toggle input:checked + .toggle__track { background-color: var(--color-accent); border-color: var(--color-accent); }
+.toggle input:checked ~ .toggle__thumb { transform: translateX(20px); }
+
+/* Slider */
+.settings-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-3);
+  outline: none;
+  cursor: pointer;
+}
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+.settings-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+/* Select */
+.settings-select {
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+}
+.settings-select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent-rgb), 0.15);
+}
+
+/* Chips de sélection d'accent color */
+.accent-grid {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.accent-chip {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: var(--transition-fast);
+}
+.accent-chip.is-active,
+.accent-chip:hover {
+  border-color: var(--color-text-primary);
+  transform: scale(1.1);
+}

@@ -1,0 +1,462 @@
+/**
+ * ============================================================
+ * IndraChat — variables.css
+ * Design Tokens (CSS Custom Properties)
+ *
+ * Toutes les valeurs de design sont définies ici.
+ * Aucune valeur "magique" ne doit apparaître dans les autres fichiers CSS.
+ * Ce fichier est la source de vérité du système de design.
+ *
+ * Sections :
+ *   1. Couleurs primitives (palette brute)
+ *   2. Sémantique claire  (thème :root / light)
+ *   3. Sémantique sombre  (thème [data-theme="dark"])
+ *   4. Couleur accent personnalisable
+ *   5. Typographie
+ *   6. Espacements & dimensionnement
+ *   7. Border-radius
+ *   8. Ombres
+ *   9. Z-index
+ *  10. Transitions & animations
+ *  11. Layout
+ * ============================================================
+ */
+
+/* ============================================================
+   1. PALETTE PRIMITIVE
+   Couleurs brutes — ne pas utiliser directement dans les composants.
+   Utiliser les tokens sémantiques ci-dessous.
+   ============================================================ */
+:root {
+  /* Neutres */
+  --primitive-neutral-0:   #ffffff;
+  --primitive-neutral-50:  #f9fafb;
+  --primitive-neutral-100: #f3f4f6;
+  --primitive-neutral-150: #eceef2;
+  --primitive-neutral-200: #e5e7eb;
+  --primitive-neutral-300: #d1d5db;
+  --primitive-neutral-400: #9ca3af;
+  --primitive-neutral-500: #6b7280;
+  --primitive-neutral-600: #4b5563;
+  --primitive-neutral-700: #374151;
+  --primitive-neutral-800: #1f2937;
+  --primitive-neutral-850: #18202d;
+  --primitive-neutral-900: #111827;
+  --primitive-neutral-950: #0a0f1a;
+  --primitive-neutral-1000: #050810;
+
+  /* Bleu (accent par défaut) */
+  --primitive-blue-100: #dbeafe;
+  --primitive-blue-200: #bfdbfe;
+  --primitive-blue-400: #60a5fa;
+  --primitive-blue-500: #3b82f6;
+  --primitive-blue-600: #2563eb;
+  --primitive-blue-700: #1d4ed8;
+
+  /* Violet */
+  --primitive-violet-400: #a78bfa;
+  --primitive-violet-500: #8b5cf6;
+  --primitive-violet-600: #7c3aed;
+
+  /* Vert */
+  --primitive-green-100: #dcfce7;
+  --primitive-green-400: #4ade80;
+  --primitive-green-500: #22c55e;
+  --primitive-green-600: #16a34a;
+
+  /* Rouge */
+  --primitive-red-100: #fee2e2;
+  --primitive-red-400: #f87171;
+  --primitive-red-500: #ef4444;
+  --primitive-red-600: #dc2626;
+
+  /* Orange / Warning */
+  --primitive-orange-100: #ffedd5;
+  --primitive-orange-400: #fb923c;
+  --primitive-orange-500: #f97316;
+
+  /* Jaune / Info */
+  --primitive-yellow-100: #fef9c3;
+  --primitive-yellow-400: #facc15;
+  --primitive-yellow-500: #eab308;
+}
+
+
+/* ============================================================
+   2. SÉMANTIQUE — THÈME CLAIR (défaut)
+   ============================================================ */
+:root,
+[data-theme="light"] {
+
+  /* ── Couleur accent (modifiable par l'utilisateur) ── */
+  --color-accent:        var(--primitive-blue-600);
+  --color-accent-light:  var(--primitive-blue-100);
+  --color-accent-hover:  var(--primitive-blue-700);
+  --color-accent-rgb:    37, 99, 235;  /* pour rgba() */
+
+  /* ── Fond principal ── */
+  --color-bg-base:       var(--primitive-neutral-50);
+  --color-bg-elevated:   var(--primitive-neutral-0);
+  --color-bg-sunken:     var(--primitive-neutral-100);
+  --color-bg-overlay:    rgba(0, 0, 0, 0.45);
+
+  /* ── Fond sidebar ── */
+  --color-sidebar-bg:    var(--primitive-neutral-100);
+  --color-sidebar-hover: var(--primitive-neutral-200);
+  --color-sidebar-active: var(--primitive-neutral-200);
+
+  /* ── Surfaces (cards, modals...) ── */
+  --color-surface:       var(--primitive-neutral-0);
+  --color-surface-2:     var(--primitive-neutral-50);
+  --color-surface-3:     var(--primitive-neutral-100);
+
+  /* ── Borders ── */
+  --color-border:        var(--primitive-neutral-200);
+  --color-border-light:  var(--primitive-neutral-150);
+  --color-border-strong: var(--primitive-neutral-300);
+
+  /* ── Textes ── */
+  --color-text-primary:   var(--primitive-neutral-900);
+  --color-text-secondary: var(--primitive-neutral-600);
+  --color-text-muted:     var(--primitive-neutral-400);
+  --color-text-inverse:   var(--primitive-neutral-0);
+  --color-text-accent:    var(--primitive-blue-600);
+
+  /* ── Messages ── */
+  --color-msg-user-bg:        var(--primitive-neutral-200);
+  --color-msg-user-text:      var(--primitive-neutral-900);
+  --color-msg-assistant-bg:   var(--primitive-neutral-0);
+  --color-msg-assistant-text: var(--primitive-neutral-900);
+
+  /* ── Code blocks ── */
+  --color-code-bg:       #1e2030;
+  --color-code-header:   #161821;
+  --color-code-text:     #cdd6f4;
+  --color-code-border:   #2d3057;
+
+  /* ── Input ── */
+  --color-input-bg:      var(--primitive-neutral-0);
+  --color-input-border:  var(--primitive-neutral-300);
+  --color-input-focus:   var(--primitive-blue-500);
+  --color-input-placeholder: var(--primitive-neutral-400);
+
+  /* ── Toast / Alerts ── */
+  --color-toast-info-bg:    var(--primitive-blue-100);
+  --color-toast-info-text:  var(--primitive-blue-700);
+  --color-toast-success-bg: var(--primitive-green-100);
+  --color-toast-success-text: var(--primitive-green-600);
+  --color-toast-warning-bg: var(--primitive-orange-100);
+  --color-toast-warning-text: var(--primitive-orange-500);
+  --color-toast-error-bg:   var(--primitive-red-100);
+  --color-toast-error-text: var(--primitive-red-600);
+
+  /* ── Scrollbar ── */
+  --color-scrollbar-thumb: var(--primitive-neutral-300);
+  --color-scrollbar-track: transparent;
+
+  /* ── Glassmorphism ── */
+  --glass-bg:           rgba(255, 255, 255, 0.72);
+  --glass-border:       rgba(255, 255, 255, 0.4);
+  --glass-blur:         16px;
+  --glass-shadow:       0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ============================================================
+   3. SÉMANTIQUE — THÈME SOMBRE
+   ============================================================ */
+[data-theme="dark"] {
+
+  /* ── Couleur accent ── */
+  --color-accent:        var(--primitive-blue-500);
+  --color-accent-light:  rgba(59, 130, 246, 0.15);
+  --color-accent-hover:  var(--primitive-blue-400);
+  --color-accent-rgb:    59, 130, 246;
+
+  /* ── Fond principal ── */
+  --color-bg-base:       var(--primitive-neutral-950);
+  --color-bg-elevated:   var(--primitive-neutral-900);
+  --color-bg-sunken:     var(--primitive-neutral-1000);
+  --color-bg-overlay:    rgba(0, 0, 0, 0.65);
+
+  /* ── Fond sidebar ── */
+  --color-sidebar-bg:    var(--primitive-neutral-900);
+  --color-sidebar-hover: var(--primitive-neutral-850);
+  --color-sidebar-active: var(--primitive-neutral-800);
+
+  /* ── Surfaces ── */
+  --color-surface:       var(--primitive-neutral-900);
+  --color-surface-2:     var(--primitive-neutral-850);
+  --color-surface-3:     var(--primitive-neutral-800);
+
+  /* ── Borders ── */
+  --color-border:        var(--primitive-neutral-800);
+  --color-border-light:  rgba(255, 255, 255, 0.06);
+  --color-border-strong: var(--primitive-neutral-700);
+
+  /* ── Textes ── */
+  --color-text-primary:   var(--primitive-neutral-50);
+  --color-text-secondary: var(--primitive-neutral-400);
+  --color-text-muted:     var(--primitive-neutral-500);
+  --color-text-inverse:   var(--primitive-neutral-900);
+  --color-text-accent:    var(--primitive-blue-400);
+
+  /* ── Messages ── */
+  --color-msg-user-bg:        var(--primitive-neutral-800);
+  --color-msg-user-text:      var(--primitive-neutral-50);
+  --color-msg-assistant-bg:   var(--primitive-neutral-900);
+  --color-msg-assistant-text: var(--primitive-neutral-100);
+
+  /* ── Code blocks ── */
+  --color-code-bg:       #13131a;
+  --color-code-header:   #0d0d14;
+  --color-code-text:     #cdd6f4;
+  --color-code-border:   #1e1e2e;
+
+  /* ── Input ── */
+  --color-input-bg:      var(--primitive-neutral-850);
+  --color-input-border:  var(--primitive-neutral-700);
+  --color-input-focus:   var(--primitive-blue-500);
+  --color-input-placeholder: var(--primitive-neutral-500);
+
+  /* ── Toast / Alerts ── */
+  --color-toast-info-bg:    rgba(59, 130, 246, 0.15);
+  --color-toast-info-text:  var(--primitive-blue-400);
+  --color-toast-success-bg: rgba(34, 197, 94, 0.15);
+  --color-toast-success-text: var(--primitive-green-400);
+  --color-toast-warning-bg: rgba(249, 115, 22, 0.15);
+  --color-toast-warning-text: var(--primitive-orange-400);
+  --color-toast-error-bg:   rgba(239, 68, 68, 0.15);
+  --color-toast-error-text: var(--primitive-red-400);
+
+  /* ── Scrollbar ── */
+  --color-scrollbar-thumb: var(--primitive-neutral-700);
+  --color-scrollbar-track: transparent;
+
+  /* ── Glassmorphism ── */
+  --glass-bg:           rgba(15, 15, 25, 0.72);
+  --glass-border:       rgba(255, 255, 255, 0.08);
+  --glass-blur:         20px;
+  --glass-shadow:       0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ============================================================
+   4. ACCENTS PERSONNALISABLES
+   L'utilisateur peut choisir parmi ces thèmes d'accent.
+   Appliqués via JS en modifiant les variables --color-accent*.
+   ============================================================ */
+[data-accent="violet"] {
+  --color-accent:       var(--primitive-violet-500);
+  --color-accent-light: rgba(139, 92, 246, 0.15);
+  --color-accent-hover: var(--primitive-violet-600);
+  --color-accent-rgb:   139, 92, 246;
+  --color-text-accent:  var(--primitive-violet-400);
+}
+[data-accent="green"] {
+  --color-accent:       var(--primitive-green-500);
+  --color-accent-light: rgba(34, 197, 94, 0.15);
+  --color-accent-hover: var(--primitive-green-600);
+  --color-accent-rgb:   34, 197, 94;
+  --color-text-accent:  var(--primitive-green-400);
+}
+[data-accent="orange"] {
+  --color-accent:       var(--primitive-orange-500);
+  --color-accent-light: rgba(249, 115, 22, 0.15);
+  --color-accent-hover: var(--primitive-orange-400);
+  --color-accent-rgb:   249, 115, 22;
+  --color-text-accent:  var(--primitive-orange-400);
+}
+
+
+/* ============================================================
+   5. TYPOGRAPHIE
+   ============================================================ */
+:root {
+  /* Familles de polices */
+  --font-sans:   'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:   'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --font-serif:  'Lora', Georgia, 'Times New Roman', serif;  /* pour contenu long */
+
+  /* Échelle de tailles (fluid-friendly) */
+  --text-xs:   0.6875rem;  /*  11px */
+  --text-sm:   0.8125rem;  /*  13px */
+  --text-base: 0.9375rem;  /*  15px */
+  --text-md:   1rem;       /*  16px */
+  --text-lg:   1.125rem;   /*  18px */
+  --text-xl:   1.25rem;    /*  20px */
+  --text-2xl:  1.5rem;     /*  24px */
+  --text-3xl:  1.875rem;   /*  30px */
+  --text-4xl:  2.25rem;    /*  36px */
+
+  /* Poids */
+  --font-weight-regular: 400;
+  --font-weight-medium:  500;
+  --font-weight-semi:    600;
+  --font-weight-bold:    700;
+
+  /* Interlignage */
+  --line-height-tight:  1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-code:   1.6;
+
+  /* Espacement des lettres */
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.04em;
+  --tracking-wider:   0.08em;
+}
+
+
+/* ============================================================
+   6. ESPACEMENTS & DIMENSIONNEMENT
+   Basé sur une grille de 4px.
+   ============================================================ */
+:root {
+  --space-0:   0;
+  --space-0-5: 0.125rem;  /*  2px */
+  --space-1:   0.25rem;   /*  4px */
+  --space-1-5: 0.375rem;  /*  6px */
+  --space-2:   0.5rem;    /*  8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3:   0.75rem;   /* 12px */
+  --space-4:   1rem;      /* 16px */
+  --space-5:   1.25rem;   /* 20px */
+  --space-6:   1.5rem;    /* 24px */
+  --space-7:   1.75rem;   /* 28px */
+  --space-8:   2rem;      /* 32px */
+  --space-10:  2.5rem;    /* 40px */
+  --space-12:  3rem;      /* 48px */
+  --space-16:  4rem;      /* 64px */
+  --space-20:  5rem;      /* 80px */
+  --space-24:  6rem;      /* 96px */
+}
+
+
+/* ============================================================
+   7. BORDER-RADIUS
+   ============================================================ */
+:root {
+  --radius-none:  0;
+  --radius-sm:    0.25rem;   /*  4px */
+  --radius-md:    0.5rem;    /*  8px */
+  --radius-lg:    0.75rem;   /* 12px */
+  --radius-xl:    1rem;      /* 16px */
+  --radius-2xl:   1.25rem;   /* 20px */
+  --radius-3xl:   1.5rem;    /* 24px */
+  --radius-full:  9999px;
+}
+
+
+/* ============================================================
+   8. OMBRES (Shadow System)
+   ============================================================ */
+:root {
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm:  0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.16);
+  --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.20);
+
+  /* Ombres colorées accent */
+  --shadow-accent: 0 4px 16px rgba(var(--color-accent-rgb), 0.35);
+
+  /* Ombres dark mode */
+  --shadow-dark-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-dark-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-dark-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] {
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm:  0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-xl:  0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-2xl: 0 24px 64px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ============================================================
+   9. Z-INDEX (Couches d'affichage)
+   ============================================================ */
+:root {
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:    10;
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-sidebar:   300;
+  --z-topbar:    400;
+  --z-overlay:   500;
+  --z-modal:     600;
+  --z-toast:     700;
+  --z-tooltip:   800;
+  --z-fullscreen: 900;
+  --z-max:       9999;
+}
+
+
+/* ============================================================
+   10. TRANSITIONS & ANIMATIONS
+   ============================================================ */
+:root {
+  /* Durées */
+  --duration-instant: 50ms;
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --duration-slower:  600ms;
+
+  /* Easing functions */
+  --ease-default:  cubic-bezier(0.4, 0, 0.2, 1);   /* Material Design standard */
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1); /* Springy */
+  --ease-bounce:   cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Transitions composées courantes */
+  --transition-fast:   all var(--duration-fast)   var(--ease-out);
+  --transition-normal: all var(--duration-normal) var(--ease-default);
+  --transition-slow:   all var(--duration-slow)   var(--ease-default);
+  --transition-colors: color var(--duration-fast) var(--ease-out),
+                       background-color var(--duration-fast) var(--ease-out),
+                       border-color var(--duration-fast) var(--ease-out);
+  --transition-transform: transform var(--duration-normal) var(--ease-spring);
+  --transition-opacity:   opacity var(--duration-fast) var(--ease-out);
+}
+
+
+/* ============================================================
+   11. LAYOUT — Dimensions des zones principales
+   ============================================================ */
+:root {
+  /* Sidebar */
+  --sidebar-width:            280px;
+  --sidebar-width-collapsed:  0px;
+  --sidebar-width-mobile:     100%;
+
+  /* Topbar */
+  --topbar-height:   56px;
+
+  /* Input area */
+  --input-area-min-height:   72px;
+  --input-area-max-height:   240px;
+
+  /* Messages */
+  --message-max-width:       768px;
+  --message-max-width-wide:  900px;
+
+  /* Modal */
+  --modal-sm:    400px;
+  --modal-md:    560px;
+  --modal-lg:    720px;
+  --modal-xl:    920px;
+  --modal-full:  95vw;
+
+  /* Scrollbar */
+  --scrollbar-width: 6px;
+}
