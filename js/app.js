@@ -22,10 +22,12 @@
  */
 
 import { APP_CONFIG, DEFAULT_SETTINGS } from './config.js';
+import { initStore, subscribe } from './state.js';
+import { initTheme } from './ui/theme.js';
+import { toastSuccess, toastError } from './ui/toast.js';
 
 /**
- * Initialisation minimal pour le rendu initial de l'UI.
- * Les autres modules seront importés au fil des étapes suivantes.
+ * Initialisation principale de l'application.
  *
  * @async
  */
@@ -39,75 +41,33 @@ async function bootstrap() {
     'background: rgba(59,130,246,0.1)',
   ].join(';'));
 
-  // ── 1. Appliquer le thème sauvegardé (avant tout rendu) ──
-  applyInitialTheme();
-
-  // ── 2. Marquer l'app comme chargée ──
-  document.getElementById('app')?.classList.add('is-ready');
-
-  // ── 3. Enregistrer les listeners de base ──
-  registerBaseListeners();
-
-  console.log('✅ IndraChat initialisé — modules complets à venir (Étape 2+)');
-}
-
-
-/**
- * Applique le thème initial depuis le LocalStorage pour éviter
- * le "flash of wrong theme" (FOWT) au chargement de la page.
- */
-function applyInitialTheme() {
-  const key = `${APP_CONFIG.storagePrefix}settings`;
-  let theme = DEFAULT_SETTINGS.theme;
-  let accent = DEFAULT_SETTINGS.accentColor;
-
   try {
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const settings = JSON.parse(raw);
-      theme  = settings.theme  ?? theme;
-      accent = settings.accentColor ?? accent;
-    }
-  } catch {
-    // LocalStorage indisponible ou JSON invalide — on garde les défauts
-  }
+    // ── 1. Initialiser le State (charge depuis le LocalStorage) ──
+    initStore();
 
-  // Résolution du thème "system"
-  if (theme === 'system') {
-    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
+    // ── 2. Initialiser le gestionnaire de Thème (s'abonne au State) ──
+    initTheme();
 
-  document.documentElement.setAttribute('data-theme', theme);
-  document.documentElement.setAttribute('data-accent', accent);
+    // ── 3. Marquer l'app comme prête visuellement ──
+    document.getElementById('app')?.classList.add('is-ready');
 
-  // Synchroniser l'icône du bouton de thème
-  updateThemeIcon(theme);
-}
+    // ── 4. Enregistrer les listeners UI globaux ──
+    registerBaseListeners();
 
-/**
- * Met à jour les icônes soleil/lune dans la topbar selon le thème actif.
- * @param {string} theme - 'dark' | 'light'
- */
-function updateThemeIcon(theme) {
-  const sunIcon  = document.getElementById('icon-sun');
-  const moonIcon = document.getElementById('icon-moon');
-  if (!sunIcon || !moonIcon) return;
+    console.log('✅ IndraChat initialisé — Étapes 1 à 5 OK');
+    
+    // Afficher un toast de bienvenue uniquement en dev (optionnel)
+    // toastSuccess('Prêt', `IndraChat v${APP_CONFIG.version} chargé avec succès.`);
 
-  if (theme === 'dark') {
-    sunIcon.classList.add('hidden');
-    moonIcon.classList.remove('hidden');
-  } else {
-    sunIcon.classList.remove('hidden');
-    moonIcon.classList.add('hidden');
+  } catch (error) {
+    console.error('❌ Erreur critique lors de l\'initialisation:', error);
+    toastError('Erreur Fatale', 'Impossible de démarrer l\'application.');
   }
 }
 
-
 /**
- * Enregistre les listeners de base qui doivent fonctionner
- * dès le chargement de la page, avant les modules complets.
- *
- * Les listeners complets seront gérés par js/events/listeners.js.
+ * Enregistre les listeners de base de l'interface principale.
+ * Les raccourcis clavier globaux seront gérés ultérieurement.
  */
 function registerBaseListeners() {
 
