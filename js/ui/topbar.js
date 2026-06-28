@@ -40,7 +40,30 @@ export function initTopbar() {
   const initProvider = getStateValue('ai.activeProviderId');
   updateProviderUI(initProvider);
   
-  // 4. Premier chargement
+  // 4. Gestion de l'ouverture/fermeture du dropdown
+  const btnSelector = document.getElementById('btn-model-selector');
+  const dropdown = document.querySelector('.model-dropdown'); // Utilisation de la classe car il manque l'ID dans HTML
+  
+  if (btnSelector && dropdown) {
+    btnSelector.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('hidden');
+      btnSelector.classList.toggle('is-open');
+    });
+
+    // Fermer si clic ailleurs
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !btnSelector.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        btnSelector.classList.remove('is-open');
+      }
+    });
+  }
+
+  // Bouton Actualiser
+  document.getElementById('btn-refresh-models')?.addEventListener('click', reloadModelsList);
+  
+  // 5. Premier chargement
   reloadModelsList().catch(() => {
     // Échec silencieux au démarrage, l'utilisateur le verra en ouvrant le dropdown
   });
@@ -76,7 +99,7 @@ function updateModelUI(modelId) {
 async function reloadModelsList() {
   const providerId = getStateValue('ai.activeProviderId');
   const provider = PROVIDERS_MAP.get(providerId);
-  const container = document.getElementById('model-list-container');
+  const container = document.getElementById('models-list'); // FIX: ID correct
   
   if (!container) return;
 
@@ -125,7 +148,7 @@ async function reloadModelsList() {
  * Filtre et génère le HTML pour les items du menu déroulant.
  */
 function renderModelsDropdown(searchQuery) {
-  const container = document.getElementById('model-list-container');
+  const container = document.getElementById('models-list'); // FIX: ID correct
   if (!container) return;
 
   const filtered = searchQuery 
@@ -173,7 +196,8 @@ function renderModelsDropdown(searchQuery) {
       updateModelUI(selectedId);
       
       // Fermer le dropdown
-      document.getElementById('model-dropdown')?.classList.add('hidden');
+      const dropdown = document.querySelector('.model-dropdown');
+      if (dropdown) dropdown.classList.add('hidden');
       document.getElementById('btn-model-selector')?.classList.remove('is-open');
     });
   });
