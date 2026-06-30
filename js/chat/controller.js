@@ -33,20 +33,15 @@ let abortController = null;
 export function initChat() {
   const btnSend = document.getElementById('btn-send');
   const btnStop = document.getElementById('btn-stop-generation');
-  const input = document.getElementById('message-input');
-  const btnNew = document.getElementById('btn-new-chat');
 
-  if (btnSend && input) {
+  if (btnSend) {
     btnSend.addEventListener('click', handleSendClick);
   }
 
   if (btnStop) {
     btnStop.addEventListener('click', stopGeneration);
   }
-
-  if (btnNew) {
-    btnNew.addEventListener('click', startNewConversation);
-  }
+  // NOTE : btn-new-chat est géré dans app.js > registerBaseListeners pour éviter le double appel.
 }
 
 /**
@@ -156,8 +151,8 @@ export async function sendMessage(textContent) {
     document.getElementById('welcome-screen')?.classList.add('hidden');
     
     // Titre temporaire (le système auto-title pourra le modifier après)
-    const title = getStateValue('settings.autoTitle') 
-      ? textContent.substring(0, 30) + '...'
+    const title = getStateValue('settings.autoTitle')
+      ? (textContent.length > 30 ? textContent.substring(0, 30) + '…' : textContent)
       : 'Nouvelle conversation';
       
     document.getElementById('conversation-title').textContent = title;
@@ -303,13 +298,14 @@ function updateUIOnFinish(startTime, firstChunkTime, charsCount) {
     const estTokens = Math.max(1, Math.ceil(charsCount / 4));
     const tokensPerSec = (estTokens / (totalTimeMs / 1000)).toFixed(1);
 
-    document.getElementById('stat-time').textContent = `${(totalTimeMs / 1000).toFixed(2)}s`;
-    document.getElementById('stat-speed').textContent = `${tokensPerSec} t/s`;
-    
+    document.getElementById('stat-time').textContent    = `${(totalTimeMs / 1000).toFixed(2)}s`;
+    document.getElementById('stat-speed').textContent   = `${tokensPerSec} t/s`;
+    document.getElementById('stat-tokens').textContent  = `${estTokens} tokens`;
+    document.getElementById('stat-model').textContent   = getStateValue('ai.activeModelId') || '—';
+    document.getElementById('stat-context').textContent = `ctx: ${currentMessages.length}`;
+
     const statTtft = document.getElementById('stat-ttft');
-    if (statTtft) {
-        statTtft.textContent = `${(ttftMs).toFixed(0)}ms`;
-    }
+    if (statTtft) statTtft.textContent = `TTFT: ${ttftMs.toFixed(0)}ms`;
   }
   
   abortController = null;

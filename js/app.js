@@ -225,15 +225,21 @@ function registerBaseListeners() {
   });
 
   // ── Clic en dehors : fermer les dropdowns ──
-  // Note : le dropdown modèle est géré dans topbar.js
-  // Ici on gère seulement le menu contextuel et les autres dropdowns
   document.addEventListener('click', (e) => {
-    const contextMenu = document.getElementById('conversation-context-menu');
-
     // Fermer le menu contextuel si clic en dehors
+    const contextMenu = document.getElementById('conversation-context-menu');
     if (contextMenu && !contextMenu.classList.contains('hidden')) {
       if (!contextMenu.contains(e.target) && !e.target.closest('.nav-item__options-btn')) {
         contextMenu.classList.add('hidden');
+      }
+    }
+
+    // Fermer le dropdown modèle si clic en dehors du bouton ET du dropdown
+    const modelDropdown = document.querySelector('.model-dropdown');
+    const btnModelSelector = document.getElementById('btn-model-selector');
+    if (modelDropdown && !modelDropdown.classList.contains('hidden')) {
+      if (!modelDropdown.contains(e.target) && !btnModelSelector?.contains(e.target)) {
+        closeAllDropdowns();
       }
     }
   });

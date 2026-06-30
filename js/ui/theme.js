@@ -67,7 +67,10 @@ function applyTheme(theme, systemIsDark) {
       : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   }
 
-  // Si le thème n'a pas changé, on ignore
+  // Toujours mettre à jour l'icône (état peut diverger si HTML a une valeur par défaut figée)
+  updateThemeIcon(resolvedTheme);
+
+  // Si le thème n'a pas changé, on évite l'animation et la mise à jour du DOM
   if (html.getAttribute('data-theme') === resolvedTheme) return;
 
   // Animation douce
@@ -75,7 +78,6 @@ function applyTheme(theme, systemIsDark) {
 
   // Application
   html.setAttribute('data-theme', resolvedTheme);
-  updateThemeIcon(resolvedTheme);
 
   // Mise à jour de la couleur de thème mobile pour PWA
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');

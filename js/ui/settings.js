@@ -117,7 +117,15 @@ function bindInputToState(elementId, statePath) {
 
   // DOM -> State
   el.addEventListener('change', (e) => {
-    dispatch(statePath, isCheckbox ? e.target.checked : e.target.value);
+    let val;
+    if (isCheckbox) {
+      val = e.target.checked;
+    } else if (el.type === 'number') {
+      val = parseFloat(e.target.value);
+    } else {
+      val = e.target.value;
+    }
+    dispatch(statePath, val);
   });
   
   // Pour les textareas/inputs textes, on peut aussi écouter 'input' avec debounce,

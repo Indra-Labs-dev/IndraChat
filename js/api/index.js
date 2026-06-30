@@ -120,8 +120,12 @@ export async function chatCompletion(messages, callbacks, signal) {
     }
     finalMessages.push(...messages);
 
+    if (!config.model || !config.model.trim()) {
+      throw new Error('Aucun modèle sélectionné. Ouvrez le sélecteur de modèle et choisissez un modèle disponible.');
+    }
+
     const adapter = await loadAdapter(config.provider.adapterModule);
-    
+
     if (typeof adapter.chatCompletion !== 'function') {
       throw new Error(`L'adaptateur ${config.provider.adapterModule} ne supporte pas chatCompletion.`);
     }
