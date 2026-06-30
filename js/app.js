@@ -8,38 +8,30 @@
  * le démarrage de l'application.
  *
  * Ordre d'initialisation :
- *   1. Thème (appliqué en premier pour éviter le flash)
- *   2. Storage (chargement des settings)
- *   3. State (initialisation avec les settings sauvegardés)
- *   4. UI (sidebar, renderer, modal, toast...)
- *   5. API (détection providers, chargement modèles)
- *   6. Events (listeners globaux)
- *   7. Conversations (chargement depuis le storage)
- *
- * Imports :
- *   - config.js, state.js, et tous les modules ui/chat/api/events
+ *   1. State (chargement des settings depuis LocalStorage)
+ *   2. Thème (appliqué en premier pour éviter le flash)
+ *   3. Database (IndexedDB)
+ *   4. UI (sidebar, topbar, modal, settings, toast...)
+ *   5. Chat (contrôleur)
+ *   6. Events (listeners globaux et raccourcis)
  * ============================================================
  */
 
 import { APP_CONFIG, DEFAULT_SETTINGS } from './config.js';
-import { initStore, subscribe } from './state.js';
+import { initStore, subscribe, getStateValue, dispatch } from './state.js';
 import { initTheme } from './ui/theme.js';
-import { initModals } from './ui/modal.js';
+import { initModals, openModal, closeModal } from './ui/modal.js';
 import { initSettingsUI } from './ui/settings.js';
-import { toastSuccess, toastError } from './ui/toast.js';
+import { toastError } from './ui/toast.js';
 import { initDB } from './storage/database.js';
-import { initChat } from './chat/controller.js';
+import { initChat, startNewConversation } from './chat/controller.js';
 import { initSidebar } from './ui/sidebar.js';
-import { initTopbar } from './ui/topbar.js';
+import { initTopbar, closeModelDropdown } from './ui/topbar.js';
 import { initGlobalListeners } from './events/listeners.js';
-import { startNewConversation } from './chat/controller.js';
 import { estimateTokens } from './utils/tokenizer.js';
-import { openModal } from './ui/modal.js';
-import { getStateValue, dispatch } from './state.js';
 
 /**
  * Initialisation principale de l'application.
- *
  * @async
  */
 async function bootstrap() {
@@ -66,9 +58,9 @@ async function bootstrap() {
     document.getElementById('app')?.classList.add('is-ready');
 
     // ── 5. Enregistrer les listeners UI et Modales ──
-    registerBaseListeners();
     initModals();
     initSettingsUI();
+    registerBaseListeners();
 
     // ── 6. Initialiser l'Interface Latérale et Supérieure ──
     initSidebar();
@@ -80,20 +72,25 @@ async function bootstrap() {
     // ── 8. Activer les Raccourcis Clavier Globaux ──
     initGlobalListeners();
 
-    console.log('✅ IndraChat est prêt ! (Toutes les étapes validées)');
-    
-    // Afficher un toast de bienvenue uniquement en dev (optionnel)
-    // toastSuccess('Prêt', `IndraChat v${APP_CONFIG.version} chargé avec succès.`);
+    console.log('✅ IndraChat est prêt !');
 
   } catch (error) {
     console.error('❌ Erreur critique lors de l\'initialisation:', error);
-    toastError('Erreur Fatale', 'Impossible de démarrer l\'application.');
+    toastError('Erreur Fatale', 'Impossible de démarrer l\'application. Vérifiez la console.');
   }
 }
 
 /**
+ * Ferme tous les menus déroulants et menus contextuels ouverts.
+ * Fonction centralisée appelée par les listeners de clic global et Escape.
+ */
+function closeAllDropdowns() {
+  closeModelDropdown();
+  document.getElementById('conversation-context-menu')?.classList.add('hidden');
+}
+
+/**
  * Enregistre les listeners de base de l'interface principale.
- * Les raccourcis clavier globaux seront gérés ultérieurement.
  */
 function registerBaseListeners() {
 
@@ -101,36 +98,67 @@ function registerBaseListeners() {
   document.getElementById('btn-toggle-theme')?.addEventListener('click', () => {
     const current = getStateValue('settings.theme');
     const next = current === 'dark' ? 'light' : 'dark';
-    dispatch('settings.theme', next); // theme.js gère l'UI (icône, attribut) via subscribe
+    dispatch('settings.theme', next); // theme.js met à jour l'UI via subscribe
   });
 
-  // ── Bouton nouveau chat ──
+  // ── Bouton nouveau chat (sidebar) ──
   document.getElementById('btn-new-chat')?.addEventListener('click', () => {
     startNewConversation();
   });
 
-  // ── Bouton paramètres ──
+  // ── Bouton paramètres (sidebar footer) ──
   document.getElementById('btn-settings')?.addEventListener('click', () => {
     openModal('settings');
   });
 
-  // ── Chips de suggestions ──
+  // ── Bouton plein écran ──
+  document.getElementById('btn-fullscreen')?.addEventListener('click', toggleFullscreen);
+
+  // ── Chips de suggestions sur l'écran de bienvenue ──
   document.getElementById('welcome-suggestions')?.addEventListener('click', (e) => {
     const chip = e.target.closest('.suggestion-chip');
     if (chip) {
       const prompt = chip.dataset.prompt;
-      const input  = document.getElementById('message-input');
+      const input = document.getElementById('message-input');
       if (input && prompt) {
         input.value = prompt;
-        input.dispatchEvent(new Event('input')); // Pour l'auto-resize et le bouton envoyer
+        input.dispatchEvent(new Event('input')); // déclenche auto-resize et activation du bouton send
         input.focus();
       }
     }
   });
 
+  // ── Titre de conversation : double-clic pour renommer ──
+  const titleEl = document.getElementById('conversation-title');
+  if (titleEl) {
+    titleEl.addEventListener('dblclick', () => {
+      titleEl.contentEditable = 'true';
+      titleEl.focus();
+      // Sélectionner tout le texte
+      const range = document.createRange();
+      range.selectNodeContents(titleEl);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    });
+
+    titleEl.addEventListener('blur', () => {
+      titleEl.contentEditable = 'false';
+    });
+
+    titleEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        titleEl.blur();
+      }
+      if (e.key === 'Escape') {
+        titleEl.contentEditable = 'false';
+      }
+    });
+  }
+
   // ── Auto-resize du textarea ──
   const textarea = document.getElementById('message-input');
-  const btnSend  = document.getElementById('btn-send');
+  const btnSend = document.getElementById('btn-send');
 
   if (textarea) {
     textarea.addEventListener('input', () => {
@@ -143,27 +171,26 @@ function registerBaseListeners() {
       if (btnSend) btnSend.disabled = !hasContent;
 
       // Compteur de tokens
-      if (typeof estimateTokens === 'function') {
-        const tokenCount = estimateTokens(textarea.value);
-        const counter    = document.getElementById('token-counter');
-        if (counter) counter.textContent = `${tokenCount} token${tokenCount !== 1 ? 's' : ''}`;
-      }
+      const tokenCount = estimateTokens(textarea.value);
+      const counter = document.getElementById('token-counter');
+      if (counter) counter.textContent = `${tokenCount} token${tokenCount !== 1 ? 's' : ''}`;
     });
 
     // Envoi avec Entrée (Shift+Entrée = nouvelle ligne)
     textarea.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      const sendOnEnter = getStateValue('settings.sendOnEnter');
+      if (e.key === 'Enter' && !e.shiftKey && sendOnEnter !== false) {
         e.preventDefault();
-        if (!btnSend?.disabled) {
-          btnSend?.click();
+        if (btnSend && !btnSend.disabled) {
+          btnSend.click();
         }
       }
     });
   }
 
-  // ── Bouton fermer recherche ──
+  // ── Bouton fermer recherche dans la sidebar ──
   const searchInput = document.getElementById('search-conversations');
-  const clearBtn    = document.getElementById('btn-clear-search');
+  const clearBtn = document.getElementById('btn-clear-search');
 
   if (searchInput && clearBtn) {
     searchInput.addEventListener('input', () => {
@@ -176,76 +203,40 @@ function registerBaseListeners() {
     });
   }
 
-  // ── Fonction utilitaire : Fermer menus ──
-  function closeAllDropdowns() {
-    document.querySelector('.model-dropdown')?.classList.add('hidden');
-    document.getElementById('btn-model-selector')?.classList.remove('is-open');
-    document.getElementById('conversation-context-menu')?.classList.add('hidden');
-  }
-
-  // ── Touche Échap — fermer les menus ouverts ──
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeAllDropdowns();
-    }
-  });
-
-  // ── Clic en dehors — fermer les dropdowns ──
-  document.addEventListener('click', (e) => {
-    const dropdown = document.querySelector('.model-dropdown');
-    const contextMenu = document.getElementById('conversation-context-menu');
-    const modelBtn = document.getElementById('btn-model-selector');
-
-    let clickedInDropdown = dropdown && !dropdown.classList.contains('hidden') && (dropdown.contains(e.target) || modelBtn?.contains(e.target));
-    let clickedInContextMenu = contextMenu && !contextMenu.classList.contains('hidden') && contextMenu.contains(e.target);
-
-    const isOptionBtn = e.target.closest('.nav-item__options-btn');
-
-    if (!clickedInDropdown && !clickedInContextMenu && !isOptionBtn) {
-      closeAllDropdowns();
-    }
-  });
-
-  // ── Bouton modèle — toggle dropdown ──
-  // Géré dans js/ui/topbar.js désormais, mais on peut le garder ici si besoin. 
-  // On le retire d'ici pour éviter les conflits car il est dans topbar.js.
-
-
-  // ── Bouton plein écran ──
-  document.getElementById('btn-fullscreen')?.addEventListener('click', toggleFullscreen);
-
-  // ── Sidebar mobile ──
+  // ── Sidebar mobile : bouton hamburger ──
   document.getElementById('btn-toggle-sidebar')?.addEventListener('click', () => {
     toggleMobileSidebar(true);
   });
   document.getElementById('sidebar-overlay')?.addEventListener('click', () => {
     toggleMobileSidebar(false);
   });
-}
 
+  // ── Touche Échap : fermer menus/modales ──
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // Si une modale est ouverte, la fermer
+      if (getStateValue('ui.activeModal')) {
+        closeModal();
+        return;
+      }
+      // Sinon fermer les dropdowns
+      closeAllDropdowns();
+    }
+  });
 
-/**
- * Ferme tous les menus déroulants ouverts.
- */
-function closeAllDropdowns() {
-  document.getElementById('model-dropdown')?.classList.add('hidden');
-  document.getElementById('btn-model-selector')?.classList.remove('is-open');
-  document.getElementById('conversation-context-menu')?.classList.add('hidden');
-}
+  // ── Clic en dehors : fermer les dropdowns ──
+  // Note : le dropdown modèle est géré dans topbar.js
+  // Ici on gère seulement le menu contextuel et les autres dropdowns
+  document.addEventListener('click', (e) => {
+    const contextMenu = document.getElementById('conversation-context-menu');
 
-/**
- * Affiche l'écran de bienvenue et cache la liste de messages.
- */
-function showWelcomeScreen() {
-  document.getElementById('welcome-screen')?.classList.remove('hidden');
-  document.getElementById('messages-list')?.replaceChildren();
-  document.getElementById('conversation-title').textContent = 'Nouvelle conversation';
-  document.getElementById('generation-stats')?.classList.add('hidden');
-  document.getElementById('message-input').value = '';
-  document.getElementById('message-input').style.height = 'auto';
-  document.getElementById('btn-send').disabled = true;
-  const counter = document.getElementById('token-counter');
-  if (counter) counter.textContent = '0 token';
+    // Fermer le menu contextuel si clic en dehors
+    if (contextMenu && !contextMenu.classList.contains('hidden')) {
+      if (!contextMenu.contains(e.target) && !e.target.closest('.nav-item__options-btn')) {
+        contextMenu.classList.add('hidden');
+      }
+    }
+  });
 }
 
 /**
@@ -264,9 +255,9 @@ function toggleFullscreen() {
  * @param {boolean} open - true pour ouvrir, false pour fermer
  */
 function toggleMobileSidebar(open) {
-  const sidebar  = document.getElementById('sidebar');
-  const overlay  = document.getElementById('sidebar-overlay');
-  const menuBtn  = document.getElementById('btn-toggle-sidebar');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const menuBtn = document.getElementById('btn-toggle-sidebar');
 
   if (open) {
     sidebar?.classList.add('is-open');
@@ -278,9 +269,6 @@ function toggleMobileSidebar(open) {
     menuBtn?.setAttribute('aria-expanded', 'false');
   }
 }
-
-
-
 
 // ── Démarrage ──
 bootstrap();

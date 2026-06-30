@@ -17,9 +17,10 @@
 import { chatCompletion } from '../api/index.js';
 import { appendMessage, updateMessageChunk, finishMessageStream, clearChatUI, scrollToBottom } from './renderer.js';
 import { saveConversation, saveMessage, getMessagesForConversation } from '../storage/database.js';
-import { generateId, generateMessageId, generateConversationId } from '../utils/ids.js';
+import { generateMessageId, generateConversationId } from '../utils/ids.js';
 import { dispatch, getStateValue } from '../state.js';
 import { toastError } from '../ui/toast.js';
+import { refreshSidebar } from '../ui/sidebar.js';
 
 // Stockage en mémoire vive de la conversation courante
 let currentMessages = [];
@@ -31,7 +32,7 @@ let abortController = null;
  */
 export function initChat() {
   const btnSend = document.getElementById('btn-send');
-  const btnStop = document.getElementById('btn-stop');
+  const btnStop = document.getElementById('btn-stop-generation');
   const input = document.getElementById('message-input');
   const btnNew = document.getElementById('btn-new-chat');
 
@@ -54,19 +55,35 @@ export function initChat() {
 export async function startNewConversation() {
   stopGeneration();
   currentMessages = [];
-  dispatch('chat.activeConversationId', null);
-  
+
+  // FIX: dispatch(null) peut être bloqué si la valeur est déjà null
+  // On force via setValueByPath directement en passant par un dispatch vers une valeur temporaire
+  const currentConvId = getStateValue('chat.activeConversationId');
+  if (currentConvId !== null) {
+    dispatch('chat.activeConversationId', null);
+  }
+
   clearChatUI();
   document.getElementById('welcome-screen')?.classList.remove('hidden');
   document.getElementById('generation-stats')?.classList.add('hidden');
-  document.getElementById('conversation-title').textContent = 'Nouvelle conversation';
-  
+  const titleEl = document.getElementById('conversation-title');
+  if (titleEl) titleEl.textContent = 'Nouvelle conversation';
+
+  // Réinitialiser l'input
   const input = document.getElementById('message-input');
   if (input) {
     input.value = '';
     input.style.height = 'auto';
     input.focus();
   }
+
+  // Réinitialiser le bouton send
+  const btnSend = document.getElementById('btn-send');
+  if (btnSend) btnSend.disabled = true;
+
+  // Réinitialiser le compteur de tokens
+  const counter = document.getElementById('token-counter');
+  if (counter) counter.textContent = '0 token';
 }
 
 /**
@@ -152,6 +169,9 @@ export async function sendMessage(textContent) {
       createdAt: Date.now(),
       updatedAt: Date.now()
     });
+
+    // Rafraîchir la sidebar pour afficher la nouvelle conversation
+    refreshSidebar();
   } else {
     // Mettre à jour l'horodatage de la conversation
     await saveConversation({
@@ -191,7 +211,7 @@ export async function sendMessage(textContent) {
   // 4. Mettre à jour l'interface (mode génération)
   dispatch('ai.isGenerating', true);
   document.getElementById('btn-send')?.classList.add('hidden');
-  document.getElementById('btn-stop')?.classList.remove('hidden');
+  document.getElementById('btn-stop-generation')?.classList.remove('hidden');
   
   // Formatage du contexte pour l'API (on exclut les métadonnées internes)
   const apiMessages = currentMessages.map(m => ({
@@ -265,7 +285,7 @@ export function stopGeneration() {
 function updateUIOnFinish(startTime, firstChunkTime, charsCount) {
   dispatch('ai.isGenerating', false);
   
-  document.getElementById('btn-stop')?.classList.add('hidden');
+  document.getElementById('btn-stop-generation')?.classList.add('hidden');
   document.getElementById('btn-send')?.classList.remove('hidden');
   document.getElementById('message-input')?.focus();
 

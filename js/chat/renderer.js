@@ -23,8 +23,63 @@ import { PROVIDERS_MAP } from '../config.js';
 let messagesListEl = null;
 
 function getListEl() {
-  if (!messagesListEl) messagesListEl = document.getElementById('messages-list');
+  if (!messagesListEl) {
+    messagesListEl = document.getElementById('messages-list');
+    // Attacher les listeners de délégation sur le conteneur une seule fois
+    if (messagesListEl) attachMessageListeners(messagesListEl);
+  }
   return messagesListEl;
+}
+
+/**
+ * Attache les listeners globaux sur le conteneur de messages.
+ * Utilisé pour les boutons Copier, Régénérer, Copier code, etc.
+ */
+function attachMessageListeners(listEl) {
+  listEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+
+    const action = btn.getAttribute('data-action');
+    const article = btn.closest('article');
+
+    if (action === 'copy') {
+      // Copier le texte brut du message
+      const contentEl = article?.querySelector('.message__content, .message__text');
+      const text = contentEl ? (contentEl.innerText || contentEl.textContent) : '';
+      navigator.clipboard.writeText(text).then(() => {
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        setTimeout(() => { btn.innerHTML = origHTML; }, 1500);
+      }).catch(() => {});
+    }
+
+    if (action === 'copy-code') {
+      // Copier le code d'un bloc de code
+      const codeBlock = btn.closest('.code-block');
+      const codeEl = codeBlock?.querySelector('code');
+      const text = codeEl ? (codeEl.innerText || codeEl.textContent) : '';
+      navigator.clipboard.writeText(text).then(() => {
+        const span = btn.querySelector('span');
+        if (span) {
+          const orig = span.textContent;
+          span.textContent = 'Copié !';
+          setTimeout(() => { span.textContent = orig; }, 1500);
+        }
+      }).catch(() => {});
+    }
+
+    if (action === 'speak') {
+      const contentEl = article?.querySelector('.message__content, .message__text');
+      const text = contentEl ? (contentEl.innerText || contentEl.textContent) : '';
+      if (text && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'fr-FR';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  });
 }
 
 /**

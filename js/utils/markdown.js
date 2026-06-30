@@ -17,48 +17,53 @@
 
 import { getStateValue } from '../state.js';
 
-// Configuration initiale de Marked.js
-if (typeof marked !== 'undefined') {
+/**
+ * Indique si le renderer Marked a déjà été configuré.
+ * FIX: Les scripts CDN sont chargés avec 'defer', donc ils ne sont pas disponibles
+ * lors de l'évaluation du module. On utilise une initialisation paresseuse (lazy).
+ */
+let markedInitialized = false;
+
+/**
+ * Configure Marked.js et son renderer personnalisé.
+ * Appelé lors du premier rendu (lazy init).
+ */
+function initMarked() {
+  if (markedInitialized || typeof marked === 'undefined') return;
+  markedInitialized = true;
+
   marked.setOptions({
     gfm: true,
     breaks: true, // Les sauts de ligne simples créent des <br>
-    
-    // Surcharge du renderer de code pour intégrer Highlight.js
-    highlight: function(code, lang) {
-      if (typeof hljs !== 'undefined') {
-        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-        return hljs.highlight(code, { language }).value;
-      }
-      return code; // Fallback si highlight.js échoue
-    }
   });
 
   // Custom renderer pour structurer nos blocs de code avec header + bouton copie
   const renderer = new marked.Renderer();
-  
-  renderer.code = function({text, lang, escaped}) {
+
+  renderer.code = function({ text, lang, escaped }) {
     // Si c'est du math (block)
     if (lang === 'math' || lang === 'latex') {
       return renderMath(text, true);
     }
-    
+
     // Si c'est un diagramme Mermaid
     if (lang === 'mermaid' && getStateValue('settings.renderMermaid')) {
       return `<div class="mermaid-block"><pre class="mermaid">${escapeHtml(text)}</pre></div>`;
     }
 
     const language = (lang || 'text').toLowerCase();
-    
+
     // Highlight syntax
-    let highlightedCode = text;
+    let highlightedCode = escapeHtml(text);
     if (typeof hljs !== 'undefined' && getStateValue('settings.codeHighlighting')) {
       const validLang = hljs.getLanguage(language) ? language : 'plaintext';
-      highlightedCode = hljs.highlight(text, { language: validLang }).value;
-    } else {
-      highlightedCode = escapeHtml(text);
+      try {
+        highlightedCode = hljs.highlight(text, { language: validLang }).value;
+      } catch (e) {
+        highlightedCode = escapeHtml(text);
+      }
     }
 
-    // Le header custom
     return `
       <div class="code-block">
         <div class="code-block__header">
@@ -74,13 +79,13 @@ if (typeof marked !== 'undefined') {
   };
 
   // Traitement inline pour les maths $ ... $
-  const originalCodespan = renderer.codespan;
-  renderer.codespan = function({text}) {
+  const originalCodespan = renderer.codespan.bind(renderer);
+  renderer.codespan = function({ text }) {
     if (text.startsWith('$') && text.endsWith('$')) {
       const math = text.slice(1, -1);
       return renderMath(math, false);
     }
-    return originalCodespan.call(this, {text});
+    return originalCodespan({ text });
   };
 
   marked.use({ renderer });
@@ -137,36 +142,39 @@ function renderMath(text, displayMode) {
 
 /**
  * Fonction principale : convertit du Markdown en HTML propre et stylisé.
- * 
+ *
  * @param {string} markdownText - Le texte brut de l'IA
  * @returns {string} Le HTML sécurisé prêt à être injecté
  */
 export function renderMarkdown(markdownText) {
   if (!markdownText) return '';
-  
+
+  // Initialisation paresseuse de Marked (les CDN scripts sont defer)
+  initMarked();
+
   // Si le rendu MD est désactivé dans les settings
   if (!getStateValue('settings.renderMarkdown')) {
     return `<div class="prose whitespace-pre-wrap">${escapeHtml(markdownText)}</div>`;
   }
 
-  // 1. Prétraitement personnalisé (ex: extraire certains tags avant marked)
+  // 1. Prétraitement personnalisé
   // On gère les blocs LaTeX \[ ... \] et inline \( ... \) qui sont courants
   let processedText = markdownText
     .replace(/\\\[([\s\S]*?)\\\]/g, '```math\n$1\n```')
-    .replace(/\\\((.*?)\\\)/g, '`$$$1$$`');
+    .replace(/\\\((.*?)\\\)/g, '`$$1$`');
 
   // 2. Parsing Markdown -> HTML
   let rawHtml = '';
   if (typeof marked !== 'undefined') {
     rawHtml = marked.parse(processedText);
   } else {
+    // Fallback basique si marked n'est pas encore chargé
     rawHtml = `<p>${escapeHtml(processedText)}</p>`;
   }
 
   // 3. Nettoyage anti-XSS
-  let cleanHtml = purifyHTML(rawHtml);
+  const cleanHtml = purifyHTML(rawHtml);
 
-  // Retour encapsulé dans la classe prose pour le CSS
   return `<div class="prose">${cleanHtml}</div>`;
 }
 

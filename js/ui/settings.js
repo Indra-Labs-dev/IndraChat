@@ -68,6 +68,33 @@ export function initSettingsUI() {
   bindInputToState('input-max-tokens', 'settings.max_tokens');
   bindToggleToState('toggle-stream', 'settings.stream');
 
+  // Connexion
+  bindSelectToState('select-provider-setting', 'settings.provider');
+  bindInputToState('input-api-url', 'settings.apiUrl');
+  bindInputToState('input-api-key', 'settings.apiKey');
+
+  // Bouton test connexion
+  const btnTest = document.getElementById('btn-test-connection');
+  const testResult = document.getElementById('connection-test-result');
+  if (btnTest && testResult) {
+    btnTest.addEventListener('click', async () => {
+      btnTest.disabled = true;
+      testResult.textContent = 'Test en cours...';
+      testResult.style.color = 'var(--color-text-muted)';
+      try {
+        const { fetchModels } = await import('../api/index.js');
+        const models = await fetchModels();
+        testResult.textContent = `✅ Connecté ! ${models.length} modèle(s) disponible(s).`;
+        testResult.style.color = '#22c55e';
+      } catch (e) {
+        testResult.textContent = `❌ Échec : ${e.message}`;
+        testResult.style.color = '#ef4444';
+      } finally {
+        btnTest.disabled = false;
+      }
+    });
+  }
+
   console.log('[UI] Paramètres initialisés');
 }
 
